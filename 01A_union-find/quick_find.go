@@ -1,14 +1,13 @@
-package main
+package unionfind
 
 import (
   "fmt"
 )
 
-func main() {
+func Run() {
   n, ok := ReadSize()
   if ok {
     fmt.Println(n)
-
   }
 }
 

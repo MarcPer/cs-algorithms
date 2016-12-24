@@ -4,6 +4,19 @@ Based on Coursera's [Algorithm, Part I](https://class.coursera.org/algs4partI-01
 
 Example codes are written in Java or Go.
 
+## Running code
+
+Code of a specific topic is run with
+
+```
+./cs-algorithms -t topicname
+```
+
+where `topicname` can be one of the following:
+
+* `unionfind`
+* `analysis`
+
 ## Table of contents
 
 1.

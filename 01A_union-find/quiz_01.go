@@ -1,10 +1,10 @@
-package main
+package unionfind
 
 import (
   "fmt"
 )
 
-func main() {
+func Blau() {
   fmt.Println("YAY")
 }
 
