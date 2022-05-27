@@ -1,49 +1,24 @@
 #!/usr/bin/env ruby
 
 def intersections(segments, points)
-  # puts "intersections(#{segments.inspect}, #{points.inspect})"
-  return [] if points.empty?
-  return Array.new(points.size) { 0 } if segments.empty?
-
-  if points.size == 1
-    return [segments.count { |seg| seg[0] <= points[0] && seg[1] >= points[0] }]
+  seg_starts = segments.map(&:first).sort
+  seg_ends = segments.map(&:last).sort
+  points.map do |point|
+    intersections_single(seg_starts, seg_ends, point)
   end
-
-  sorted_seg_starts = segments.sort { |seg| seg[0] }
-  sorted_seg_ends = segments.sort { |seg| seg[1] }
-
-  mid_idx = (points.size-1)/2
-  # puts "  Midpoints arr[#{mid_idx}]=#{points[mid_idx]}   arr[#{mid_idx+1}]=#{points[mid_idx+1]}"
-  c1 = intersections(interval_to_max_start(sorted_seg_starts, points[mid_idx]), points[0..mid_idx])
-  c2 = intersections(interval_from_min_end(sorted_seg_ends, points[mid_idx+1]), points[mid_idx+1..-1])
-  c1+c2
 end
 
-# The algorithm needs points to be sorted, but to get the final answer, they should
-# be ordered as they were in the beginning.
-# indexed_points is used to bring each point's inversion count to its original position.
-def sort_and_count(segments, points)
-  indexed_points = []
-  points.each_with_index { |pt, i| indexed_points << [i, pt] }
-  indexed_points.sort_by!{ |ip| ip[1] }
-  unsorted_counts = intersections(segments, indexed_points.map(&:last))
-  output = []
-  indexed_points.each_with_index do |ip, idx|
-    output[ip[0]] = unsorted_counts[idx]
-  end
-  output
-end
+def intersections_single(seg_starts, seg_ends, point)
+  # filter out segments that start after point
+  idx0 = find_last_seq(seg_starts, point, 0, seg_starts.size-1)
+  return 0 if idx0 < 0
 
-def interval_to_max_start(segments, target)
-  idx = find_last_seq(segments.map(&:first), target, 0, segments.size-1)
-  # puts "  last_idx=#{idx}, segs=#{segments.map(&:first)}, target=#{target}"
-  idx < 0 ? [] : segments[0..idx]
-end
+  # filter out segments that end before point
+  # puts "seg_starts=#{seg_starts.inspect} seg_ends=#{seg_ends} idx0=#{idx0} filtered=#{seg_ends[0..idx0]}" if point == 2
+  idx1 = find_first_geq(seg_ends[0..idx0], point, 0, idx0)
+  return 0 if idx1 < 0
 
-def interval_from_min_end(segments, target)
-  idx = find_first_geq(segments.map(&:last), target, 0, segments.size-1)
-  # puts "  first_idx=#{idx}, segs=#{segments.map(&:last)}, target=#{target}"
-  idx < 0 ? [] : segments[idx..-1]
+  idx0-idx1+1
 end
 
 # Find first element in list that is greater than or equal to item
@@ -82,5 +57,5 @@ if $0 == __FILE__
   segs = num_segs.times.map { gets.strip.split.map(&:to_i) }
   points = gets.strip.split.map(&:to_i)
   points = points[0..num_points-1]
-  puts sort_and_count(segs, points).join(" ")
+  puts intersections(segs, points).join(" ")
 end

@@ -4,14 +4,14 @@ require_relative './points_and_segments.rb'
 class SolutionTest < Minitest::Test
   INPUTS = [
       # {'segments' => [[0, 5], [7, 10]], 'points' => [1, 6, 11], 'exp_output' => [1, 0, 0]},
-      # {'segments' => [[0, 1], [0, 2]], 'points' => [1, 2, 3], 'exp_output' => [2, 1, 0]},
+      {'segments' => [[0, 1], [0, 2]], 'points' => [1, 2, 3], 'exp_output' => [2, 1, 0]},
       # {'segments' => [[0, 10], [0, 20]], 'points' => [1, 2, 3], 'exp_output' => [2, 2, 2]},
       # {'segments' => [[0, 1], [5, 6]], 'points' => [2, 3], 'exp_output' => [0, 0]},
-      {'segments' => [[-10, 10]], 'points' => [-100, 100, 0], 'exp_output' => [0, 0, 1]},
+      # {'segments' => [[-10, 10]], 'points' => [-100, 100, 0], 'exp_output' => [0, 0, 1]},
   ]
   def test_solution
     INPUTS.each do |input|
-      out = sort_and_count(input['segments'].dup, input['points'].dup)
+      out = intersections(input['segments'].dup, input['points'].dup)
       assert_equal input['exp_output'], out, input
     end
   end
