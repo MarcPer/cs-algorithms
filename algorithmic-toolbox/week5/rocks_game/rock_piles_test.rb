@@ -13,8 +13,8 @@ class SolutionTest < Minitest::Test
       {'state' => [10,9], 'exp_op' => [0,1]},
     ]
 
-    solver = Solver.new(ops)
     specs.each do |spec|
+      solver = Solver.new(ops)
       solver.debug = spec['debug']
       out = solver.best_strategy(State.new(spec['state']))
       assert_equal spec['exp_op'], out, "Input state: #{spec['state']}"
