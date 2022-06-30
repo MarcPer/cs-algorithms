@@ -1,7 +1,6 @@
 go 1.18
 
 use (
-	./util
 	./week2/1_fibonacci_number
 	./week2/2_last_digit_of_fibonacci_number
 	./week2/3_greatest_common_divisor
