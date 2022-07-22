@@ -9,7 +9,9 @@ class SolutionTest < Minitest::Test
       {str1: "cool", str2: "toolbox", want: [[1,1,3]]},
       {str1: "aaa", str2: "bb", want: [[0,0,0]]},
       {str1: "aabaa", str2: "babbaab", want: [[0,4,3], [2,3,3]]},
+      {str1: "voteforthegreatalbaniaforyou", str2: "choosethegreatalbanianfuture", want: [[7,6,15]]},
       {str1: "a"*1000, str2: "a"*1001, want: [[0,0,1000],[0,1,1000]]},
+      {str1: "a"*1000, str2: "b"*1000, want: [[0,0,0]]},
     ]
 
     specs.each do |spec|
