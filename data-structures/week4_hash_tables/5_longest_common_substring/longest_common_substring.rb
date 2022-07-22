@@ -35,6 +35,7 @@ class SubstrComparer
     # and len is the found length.
     # returns [0,0,0] if no match is found
     max_match = [0,0,0]
+    len = nil
 
     while top > bottom
       len = (top+bottom)/2
@@ -47,7 +48,7 @@ class SubstrComparer
       end
     end
 
-    if bottom == top && (m=match_len(top))
+    if bottom == top && top != len && (m=match_len(top))
       max_match = [m[0], m[1], top]
     end
 
@@ -57,30 +58,41 @@ class SubstrComparer
   def match_len(len)
     return if len == 0
 
-    xl = @mods.map { |m| mod_power(@hash_x, len, m) } 
+    mods = @mods
+    xl = mods.map { |m| mod_power(@hash_x, len, m) }
 
-    (0..@size1-len).each do |s1i|
-      (0..@size2-len).each do |s2i|
-        return [s1i, s2i] if substr_equal?(s1i, s2i, len, xl)
+    # lazily-evaluated hashes for all substrings of string 1 with length len
+    h1 = @hashes1
+    h1len = (0..@size1-len).lazy.map do |i|
+      mods.map.with_index do |mod, mod_idx|
+        (h1[i+len][mod_idx]-xl[mod_idx]*h1[i][mod_idx]) % mod
+      end
+    end
+
+    # hold computed values of elements in enumerator h1len
+    h1len_mat = Array.new(@size1-len+1)
+
+    h2 = @hashes2
+    (0..@size2-len).each do |s2i|
+      v = (0..mods.size-1).map do |mod_idx|
+          (h2[s2i+len][mod_idx]-xl[mod_idx]*h2[s2i][mod_idx]) % mods[mod_idx]
+      end
+      (0..@size1-len).each do |s1i|
+        h1v = h1len_mat[s1i] || (h1len_mat[s1i]=h1len.next)
+
+        # there's a match only if the hashes match for all hash functions
+        match = (0..mods.size-1).inject(true) do |memo, mod_idx|
+          next false unless memo
+
+          v[mod_idx] == h1v[mod_idx]
+        end
+
+        return [s1i, s2i] if match
       end
     end
 
     # no match found
     nil
-  end
-
-  def substr_equal?(ia, ib, len, xl)
-    # puts "ia=#{ia} ib=#{ib} len=#{len}"
-    h1 = @hashes1
-    h2 = @hashes2
-    @mods.each_with_index do |mod, mod_idx|
-      v1 = (h1[ia+len][mod_idx]-xl[mod_idx]*h1[ia][mod_idx]) % mod
-      v2 = (h2[ib+len][mod_idx]-xl[mod_idx]*h2[ib][mod_idx]) % mod
-
-      return false if v1 != v2
-    end
-
-    true
   end
 
   def self.max_substr(s1, s2)
