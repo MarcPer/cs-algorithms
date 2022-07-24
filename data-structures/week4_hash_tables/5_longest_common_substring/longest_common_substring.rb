@@ -61,34 +61,32 @@ class SubstrComparer
     mods = @mods
     xl = mods.map { |m| mod_power(@hash_x, len, m) }
 
-    # lazily-evaluated hashes for all substrings of string 1 with length len
+    # hashes for all substrings of string 1 with length len
     h1 = @hashes1
-    h1len = (0..@size1-len).lazy.map do |i|
-      mods.map.with_index do |mod, mod_idx|
-        (h1[i+len][mod_idx]-xl[mod_idx]*h1[i][mod_idx]) % mod
+    h1len = mods.map.with_index do |mod, mod_idx|
+      s = {}
+      (0..@size1-len).each do |i|
+        s[(h1[i+len][mod_idx]-xl[mod_idx]*h1[i][mod_idx]) % mod] = i
       end
+      s
     end
-
-    # hold computed values of elements in enumerator h1len
-    h1len_mat = Array.new(@size1-len+1)
 
     h2 = @hashes2
     (0..@size2-len).each do |s2i|
-      v = (0..mods.size-1).map do |mod_idx|
-          (h2[s2i+len][mod_idx]-xl[mod_idx]*h2[s2i][mod_idx]) % mods[mod_idx]
+      s1i = nil
+      match = (0..mods.size-1).inject(true) do |memo, mod_idx|
+        next false unless memo
+
+        v = (h2[s2i+len][mod_idx]-xl[mod_idx]*h2[s2i][mod_idx]) % mods[mod_idx]
+        curr_s1i = h1len[mod_idx][v]
+
+        next false if curr_s1i.nil?
+        s1i ||= curr_s1i
+
+        s1i == curr_s1i
       end
-      (0..@size1-len).each do |s1i|
-        h1v = h1len_mat[s1i] || (h1len_mat[s1i]=h1len.next)
 
-        # there's a match only if the hashes match for all hash functions
-        match = (0..mods.size-1).inject(true) do |memo, mod_idx|
-          next false unless memo
-
-          v[mod_idx] == h1v[mod_idx]
-        end
-
-        return [s1i, s2i] if match
-      end
+      return [s1i, s2i] if match
     end
 
     # no match found
