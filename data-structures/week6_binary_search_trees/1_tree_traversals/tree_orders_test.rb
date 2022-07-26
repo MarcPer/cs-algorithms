@@ -14,8 +14,12 @@ class TestSolution < Minitest::Test
       },
       {input: ["0 -1 1", "1 -1 2", "2 -1 3", "3 -1 -1"], want: [0,1,2,3]},
       {
+        input: Array.new(9){|i| "#{i} #{i+1} -1"}.push("9 -1 -1"),
+        want: Array.new(10){_1}.reverse
+      },
+      {
         input: Array.new(99_999){|i| "#{i} #{i+1} -1"}.push("99999 -1 -1"),
-        want: Array.new(100_000){_1}
+        want: Array.new(100_000){99_999 - _1}
       },
     ]
 
@@ -36,6 +40,14 @@ class TestSolution < Minitest::Test
           "50 -1 -1", "60 1 -1", "70 5 4", "80 -1 -1", "90 -1 -1",
         ],
         want: [0,70,50,40,30,80,90,20,60,10]
+      },
+      {
+        input: Array.new(9){|i| "#{i} #{i+1} -1"}.push("9 -1 -1"),
+        want: Array.new(10){_1}
+      },
+      {
+        input: Array.new(99_999){|i| "#{i} #{i+1} -1"}.push("99999 -1 -1"),
+        want: Array.new(100_000){_1}
       },
     ]
 

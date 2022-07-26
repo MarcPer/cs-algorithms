@@ -15,22 +15,43 @@ def build_tree(tree_size, input)
   nodes.first
 end
 
-def traverse_in_order(node, &block)
-  traverse_in_order(node.left, &block) if node.left
-  yield node
-  traverse_in_order(node.right, &block) if node.right
+def traverse_in_order(node)
+  stack = []
+  stack << node
+  while (n = stack.pop)
+    stack.push(n.right) if n.right
+
+    if n.left
+      stack.push(Node.new(n.val, nil, nil))
+      stack.push(n.left)
+    else
+      yield n
+    end
+  end
 end
 
-def traverse_pre_order(node, &block)
-  yield node
-  traverse_pre_order(node.left, &block) if node.left
-  traverse_pre_order(node.right, &block) if node.right
+def traverse_pre_order(node)
+  stack = []
+  stack << node
+  while (n = stack.pop)
+    yield n
+    stack.push(n.right) if n.right
+    stack.push(n.left) if n.left
+  end
 end
 
-def traverse_post_order(node, &block)
-  traverse_post_order(node.left, &block) if node.left
-  traverse_post_order(node.right, &block) if node.right
-  yield node
+def traverse_post_order(node)
+  stack = []
+  stack << node
+  while (n = stack.pop)
+    if n.left || n.right
+      stack.push(Node.new(n.val, nil, nil))
+      stack.push(n.right) if n.right
+      stack.push(n.left) if n.left
+    else
+      yield n
+    end
+  end
 end
 
 if $0 == __FILE__
